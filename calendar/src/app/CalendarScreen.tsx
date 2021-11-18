@@ -10,6 +10,9 @@ import Button from "@material-ui/core/Button";
 import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Icon from "@material-ui/core/Icon";
+import { IconButton } from "@material-ui/core";
+import Avatar from "@mui/material/Avatar";
 
 const useStyles = makeStyles((theme?: any) => ({
   table: {
@@ -49,6 +52,24 @@ export default function CalendarScreen() {
         </FormGroup>
       </Box>
       <TableContainer component={"div"}>
+        <Box display="flex" padding="8px 16px">
+          <IconButton>
+            <Icon>chevron_left</Icon>
+          </IconButton>
+          <IconButton>
+            <Icon>chevron_right</Icon>
+          </IconButton>
+          <Box flex="1" textAlign="center">
+            <h3>Novembro de 2021</h3>
+          </Box>
+          <Box display="flex" alignItems="center" justifyItems="center">
+            <IconButton>
+              <Avatar alt="avatar">
+                <Icon>person</Icon>
+              </Avatar>
+            </IconButton>
+          </Box>
+        </Box>
         <Table
           size="small"
           aria-label="a dense table"
