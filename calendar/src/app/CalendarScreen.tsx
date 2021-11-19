@@ -16,7 +16,13 @@ import Avatar from '@mui/material/Avatar';
 
 import { DAYS_OF_WEEK, ICalendarCell, generateCalendar } from './services/date';
 import { useEffect, useState } from 'react';
-import { getEventsEndpoint, IEvent } from './services/backend';
+import {
+    EventWithCalendar,
+    getCalendarsEndpoint,
+    getEventsEndpoint,
+    ICalendar,
+    IEvent,
+} from './services/backend';
 
 const useStyles = makeStyles((theme?: any) => ({
     table: {
@@ -59,19 +65,47 @@ const useStyles = makeStyles((theme?: any) => ({
 
 export default function CalendarScreen() {
     const [events, setEvents] = useState<IEvent[]>([]);
-    const classes = useStyles();
+    const [calendars, setCalendars] = useState<ICalendar[]>([]);
+    const [selectedCalendars, setSelectedCalendars] = useState<boolean[]>([]);
+
+    const selectedCalendarEvents: IEvent[] = [];
+    for (const event of events) {
+        const index = calendars.findIndex((cal) => cal.id === event.calendarId);
+        if (selectedCalendars[index]) {
+            selectedCalendarEvents.push(event);
+        }
+    }
+
     const weeks = generateCalendar(
         new Date().toISOString().slice(0, 10),
-        events
+        selectedCalendarEvents,
+        calendars
     );
     const firstDate = weeks[0][0].date;
     const lastDate = weeks[weeks.length - 1][6].date;
+
     useEffect(() => {
-        getEventsEndpoint(firstDate, lastDate).then((events) => {
+        Promise.all([
+            getCalendarsEndpoint(),
+            getEventsEndpoint(firstDate, lastDate),
+        ]).then(([calendars, events]) => {
+            setSelectedCalendars(calendars.map((_) => true));
+            setCalendars(calendars);
             setEvents(events);
         });
         return () => {};
     }, [firstDate, lastDate]);
+
+    function toggleSelectedCalendar(index: number) {
+        setSelectedCalendars((oldCalendars) => {
+            const newCalendars = [...oldCalendars];
+            newCalendars[index] = !oldCalendars[index];
+            return newCalendars;
+        });
+    }
+
+    const classes = useStyles();
+
     return (
         <Box display="flex" height="100%">
             <Box className={classes.agenda}>
@@ -80,14 +114,24 @@ export default function CalendarScreen() {
                     Novo evento
                 </Button>
                 <FormGroup>
-                    <FormControlLabel
-                        control={<Checkbox name="agenda 1" />}
-                        label="Agenda 1"
-                    />
-                    <FormControlLabel
-                        control={<Checkbox name="agenda 2" />}
-                        label="Agenda 2"
-                    />
+                    {calendars.map((calendar, i) => (
+                        <FormControlLabel
+                            key={calendar.id}
+                            control={
+                                <Checkbox
+                                    name={calendar.name}
+                                    sx={{
+                                        '&.Mui-checked': {
+                                            color: calendar.color,
+                                        },
+                                    }}
+                                    checked={selectedCalendars[i]}
+                                    onChange={() => toggleSelectedCalendar(i)}
+                                />
+                            }
+                            label={calendar.name}
+                        />
+                    ))}
                 </FormGroup>
             </Box>
             <TableContainer
@@ -131,8 +175,8 @@ export default function CalendarScreen() {
                         </TableRow>
                     </TableHead>
                     <TableBody className={classes.tbody}>
-                        {weeks.map((week) => (
-                            <TableRow>
+                        {weeks.map((week, i) => (
+                            <TableRow key={i}>
                                 {week.map((cell) => (
                                     <TableCell align="center" key={cell.date}>
                                         <div className={classes.dayOfMonth}>
@@ -142,9 +186,19 @@ export default function CalendarScreen() {
                                             <Button
                                                 key={event.id}
                                                 className={classes.event}
+                                                style={{
+                                                    backgroundColor:
+                                                        event.calendar.color,
+                                                    color: 'white',
+                                                }}
                                             >
                                                 {event.time && (
-                                                    <Icon fontSize="inherit">
+                                                    <Icon
+                                                        fontSize="inherit"
+                                                        style={{
+                                                            color: 'white',
+                                                        }}
+                                                    >
                                                         watch_later
                                                     </Icon>
                                                 )}

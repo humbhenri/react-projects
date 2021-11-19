@@ -1,8 +1,8 @@
-import { IEvent } from './backend';
+import { IEvent, ICalendar, EventWithCalendar } from './backend';
 
 export interface ICalendarCell {
     date: string;
-    events: IEvent[];
+    events: EventWithCalendar[];
     dayOfMonth: number;
 }
 
@@ -10,7 +10,8 @@ export const DAYS_OF_WEEK = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 export function generateCalendar(
     date: string,
-    events: IEvent[]
+    events: IEvent[],
+    calendars: ICalendar[]
 ): ICalendarCell[][] {
     const weeks: ICalendarCell[][] = [];
     const jsDate = new Date(`${date}T12:00:00`);
@@ -29,7 +30,14 @@ export function generateCalendar(
             const isoDate = `${currentDay.getFullYear()}-${monthStr}-${dayStr}`;
             week.push({
                 date: isoDate,
-                events: events.filter(({ date }) => date === isoDate),
+                events: events
+                    .filter((event) => event.date === isoDate)
+                    .map((e) => {
+                        const calendar: ICalendar = calendars.find(
+                            (cal) => cal.id === e.calendarId
+                        )!;
+                        return { ...e, calendar };
+                    }),
                 dayOfMonth: currentDay.getDate(),
             });
             currentDay.setDate(currentDay.getDate() + 1);

@@ -12,6 +12,8 @@ export interface IEvent {
     calendarId: number;
 }
 
+export type EventWithCalendar = IEvent & { calendar: ICalendar };
+
 export async function getCalendarsEndpoint(): Promise<ICalendar[]> {
     const resp = await fetch('http://127.0.0.1:8080/calendars');
     return resp.json();
