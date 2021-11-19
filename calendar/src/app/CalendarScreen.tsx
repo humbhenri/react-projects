@@ -14,15 +14,22 @@ import Icon from '@material-ui/core/Icon';
 import { IconButton } from '@material-ui/core';
 import Avatar from '@mui/material/Avatar';
 
-import { DAYS_OF_WEEK, ICalendarCell, generateCalendar } from './services/date';
+import {
+    DAYS_OF_WEEK,
+    formatMonth,
+    generateCalendar,
+    nextMonth,
+    previousMonth,
+} from './services/date';
 import { useEffect, useState } from 'react';
 import {
-    EventWithCalendar,
     getCalendarsEndpoint,
     getEventsEndpoint,
     ICalendar,
     IEvent,
 } from './services/backend';
+import { useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme?: any) => ({
     table: {
@@ -64,6 +71,8 @@ const useStyles = makeStyles((theme?: any) => ({
 }));
 
 export default function CalendarScreen() {
+    const { month } = useParams<'month'>();
+
     const [events, setEvents] = useState<IEvent[]>([]);
     const [calendars, setCalendars] = useState<ICalendar[]>([]);
     const [selectedCalendars, setSelectedCalendars] = useState<boolean[]>([]);
@@ -77,7 +86,7 @@ export default function CalendarScreen() {
     }
 
     const weeks = generateCalendar(
-        new Date().toISOString().slice(0, 10),
+        month + '-01',
         selectedCalendarEvents,
         calendars
     );
@@ -113,6 +122,7 @@ export default function CalendarScreen() {
                 <Button variant="contained" color="primary">
                     Novo evento
                 </Button>
+                <h2 style={{ marginTop: '2em' }}>Agendas</h2>
                 <FormGroup>
                     {calendars.map((calendar, i) => (
                         <FormControlLabel
@@ -139,14 +149,20 @@ export default function CalendarScreen() {
                 className={classes.tableContainer}
             >
                 <Box display="flex" padding="8px 16px">
-                    <IconButton>
+                    <IconButton
+                        component={Link}
+                        to={`/calendar/${previousMonth(month ?? '')}`}
+                    >
                         <Icon>chevron_left</Icon>
                     </IconButton>
-                    <IconButton>
+                    <IconButton
+                        component={Link}
+                        to={`/calendar/${nextMonth(month ?? '')}`}
+                    >
                         <Icon>chevron_right</Icon>
                     </IconButton>
                     <Box flex="1" textAlign="center">
-                        <h3>Novembro de 2021</h3>
+                        <h3>{formatMonth(month ?? '')}</h3>
                     </Box>
                     <Box
                         display="flex"
