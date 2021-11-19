@@ -14,12 +14,15 @@ import Icon from "@material-ui/core/Icon";
 import { IconButton } from "@material-ui/core";
 import Avatar from "@mui/material/Avatar";
 
+import { DAYS_OF_WEEK, ICalendarCell, generateCalendar } from "./services/date";
+
 const useStyles = makeStyles((theme?: any) => ({
   table: {
     height: "100%",
     "& td ~ td, & th ~ th": {
       borderLeft: "1px solid rgb(224, 224, 224)",
     },
+    borderTop: "1px solid rgb(224, 224, 224)",
   },
   tbody: {
     height: "100%",
@@ -28,10 +31,15 @@ const useStyles = makeStyles((theme?: any) => ({
     minWidth: "16em",
     padding: "8px 16px",
   },
+  tableContainer: {
+    display: "flex",
+    flexDirection: "column",
+    borderLeft: "1px solid rgb(224, 224, 224)",
+  },
 }));
 
-const rows = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 export default function CalendarScreen() {
+  const weeks = generateCalendar(new Date().toISOString().slice(0, 10));
   const classes = useStyles();
   return (
     <Box display="flex" height="100%">
@@ -51,7 +59,7 @@ export default function CalendarScreen() {
           />
         </FormGroup>
       </Box>
-      <TableContainer component={"div"}>
+      <TableContainer component={"div"} className={classes.tableContainer}>
         <Box display="flex" padding="8px 16px">
           <IconButton>
             <Icon>chevron_left</Icon>
@@ -77,41 +85,21 @@ export default function CalendarScreen() {
         >
           <TableHead>
             <TableRow>
-              {rows.map((row) => (
-                <TableCell align="center" key={row}>
-                  {row}
+              {DAYS_OF_WEEK.map((day) => (
+                <TableCell align="center" key={day}>
+                  {day}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody className={classes.tbody}>
-            <TableRow>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-              <TableCell align="center">x</TableCell>
-            </TableRow>
+            {weeks.map(week => 
+              <TableRow>
+                {week.map(day => 
+                  <TableCell align="center" key={day.date}>{day.date}</TableCell>
+                )}
+              </TableRow>  
+            )}
           </TableBody>
         </Table>
       </TableContainer>
