@@ -65,6 +65,11 @@ export default function CalendarScreen() {
         });
     }
 
+    async function refreshEvents() {
+        const events = await getEventsEndpoint(firstDate, lastDate);
+        setEvents(events);
+    }
+
     const classes = useStyles();
 
     return (
@@ -73,6 +78,7 @@ export default function CalendarScreen() {
                 calendars={calendars}
                 toggleSelectedCalendar={toggleSelectedCalendar}
                 selectedCalendars={selectedCalendars}
+                refreshEvents={refreshEvents}
             />
             <TableContainer
                 component={'div'}

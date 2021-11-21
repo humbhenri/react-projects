@@ -20,10 +20,16 @@ interface ICalendarsViewProps {
     calendars: ICalendar[];
     toggleSelectedCalendar: (i: number) => void;
     selectedCalendars: boolean[];
+    refreshEvents: () => void;
 }
 
 export default function CalendarsView(props: ICalendarsViewProps) {
-    const { calendars, toggleSelectedCalendar, selectedCalendars } = props;
+    const {
+        calendars,
+        toggleSelectedCalendar,
+        selectedCalendars,
+        refreshEvents,
+    } = props;
     const [editingEvent, setEditingEvent] = useState<IEvent | null>(null);
 
     const classes = useStyles();
@@ -35,6 +41,11 @@ export default function CalendarsView(props: ICalendarsViewProps) {
             desc: '',
             calendarId: calendars[0].id,
         });
+    }
+
+    function handleEventSave() {
+        setEditingEvent(null);
+        refreshEvents();
     }
 
     return (
@@ -70,7 +81,8 @@ export default function CalendarsView(props: ICalendarsViewProps) {
             </FormGroup>
             <EventFormDialog
                 open={!!editingEvent}
-                onClose={() => setEditingEvent(null)}
+                onCancel={() => setEditingEvent(null)}
+                onSave={handleEventSave}
                 calendars={calendars}
                 event={editingEvent}
             />
