@@ -5,7 +5,7 @@ export interface ICalendar {
 }
 
 export interface IEvent {
-    id: number;
+    id?: number;
     date: string;
     time?: string;
     desc: string;
