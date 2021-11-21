@@ -1,4 +1,5 @@
 import {
+    Box,
     FormControl,
     InputLabel,
     MenuItem,
@@ -12,12 +13,17 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
-import { createEventEndpoint, ICalendar, IEvent } from './services/backend';
+import {
+    createOrUpdateEventEndpoint,
+    ICalendar,
+    IEvent,
+} from './services/backend';
 
 interface IEventFormDialogProps {
     open: boolean;
     onCancel: () => void;
     onSave: () => void;
+    onDelete: () => void;
     calendars: ICalendar[];
     event: IEvent | null;
 }
@@ -27,7 +33,7 @@ interface IValidationErrors {
 }
 
 export default function EventFormDialog(props: IEventFormDialogProps) {
-    const { open, onCancel, onSave, calendars } = props;
+    const { open, onCancel, onSave, calendars, onDelete } = props;
     const [event, setEvent] = useState(props.event);
     const [errors, setErrors] = useState<IValidationErrors>({});
 
@@ -73,7 +79,7 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
     async function save(evt: FormEvent) {
         evt.preventDefault();
         if (validate()) {
-            await createEventEndpoint(event!);
+            await createOrUpdateEventEndpoint(event!);
             onSave();
         }
     }
@@ -83,7 +89,9 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
             {event && (
                 <Dialog open={open} onClose={onCancel}>
                     <form onSubmit={save}>
-                        <DialogTitle>New event</DialogTitle>
+                        <DialogTitle>
+                            {!!event.id ? 'Save event' : 'New event'}
+                        </DialogTitle>
                         <DialogContent>
                             <>
                                 <TextField
@@ -138,6 +146,18 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
                             </FormControl>
                         </DialogContent>
                         <DialogActions>
+                            {event.id && (
+                                <>
+                                    <Button
+                                        type="button"
+                                        onClick={onDelete}
+                                        color="error"
+                                    >
+                                        Excluir
+                                    </Button>
+                                    <Box flex="1"></Box>
+                                </>
+                            )}
                             <Button type="button" onClick={onCancel}>
                                 Cancel
                             </Button>

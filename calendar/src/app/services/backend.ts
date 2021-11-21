@@ -31,11 +31,21 @@ export async function getEventsEndpoint(
     return resp.json();
 }
 
-export async function createEventEndpoint(event: IEvent): Promise<IEvent> {
-    const resp = await fetch(`${baseUrl}/events`, {
-        method: 'POST',
+export async function createOrUpdateEventEndpoint(
+    event: IEvent
+): Promise<IEvent> {
+    const isNew = !event.id;
+    const id = event.id ?? '';
+    const resp = await fetch(`${baseUrl}/events/${id}`, {
+        method: isNew ? 'POST' : 'PUT',
         body: JSON.stringify(event),
         headers: { 'Content-Type': 'application/json' },
     });
     return resp.json();
+}
+
+export async function deleteEventEndpoint(eventId: number): Promise<void> {
+    await fetch(`${baseUrl}/events/${eventId}`, {
+        method: 'DELETE',
+    });
 }

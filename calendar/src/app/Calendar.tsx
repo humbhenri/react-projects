@@ -7,6 +7,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { makeStyles } from '@mui/styles';
+import React from 'react';
+import { IEvent } from './services/backend';
 import { DAYS_OF_WEEK, ICalendarCell } from './services/date';
 
 const useStyles = makeStyles(() => ({
@@ -46,12 +48,25 @@ const useStyles = makeStyles(() => ({
 
 interface ICalendarProps {
     weeks: ICalendarCell[][];
+    onDayClicked: (date: string) => void;
+    onEventClicked: (event: IEvent) => void;
 }
 
 export default function Calendar(props: ICalendarProps) {
-    const { weeks } = props;
+    const { weeks, onDayClicked, onEventClicked } = props;
 
     const classes = useStyles();
+
+    function handleEventClick(evt: React.MouseEvent, event: IEvent) {
+        onEventClicked(event);
+    }
+
+    function handleCellClick(evt: React.MouseEvent, date: string) {
+        if (evt.target === evt.currentTarget) {
+            // clicado na área vazia
+            onDayClicked(date);
+        }
+    }
 
     return (
         <Table
@@ -72,12 +87,19 @@ export default function Calendar(props: ICalendarProps) {
                 {weeks.map((week, i) => (
                     <TableRow key={i}>
                         {week.map((cell) => (
-                            <TableCell align="center" key={cell.date}>
+                            <TableCell
+                                align="center"
+                                key={cell.date}
+                                onClick={(e) => handleCellClick(e, cell.date)}
+                            >
                                 <div className={classes.dayOfMonth}>
                                     {cell.dayOfMonth}
                                 </div>
                                 {cell.events.map((event) => (
                                     <Button
+                                        onClick={(e) =>
+                                            handleEventClick(e, event)
+                                        }
                                         key={event.id}
                                         className={classes.event}
                                         style={{

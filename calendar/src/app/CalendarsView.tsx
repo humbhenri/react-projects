@@ -4,10 +4,7 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import { makeStyles } from '@mui/styles';
-import { useState } from 'react';
-import EventFormDialog from './EventFormDialog';
-import { ICalendar, IEvent } from './services/backend';
-import { getToday } from './services/date';
+import { ICalendar } from './services/backend';
 
 const useStyles = makeStyles((theme?: any) => ({
     agenda: {
@@ -20,41 +17,18 @@ interface ICalendarsViewProps {
     calendars: ICalendar[];
     toggleSelectedCalendar: (i: number) => void;
     selectedCalendars: boolean[];
-    refreshEvents: () => void;
+    onNewEvent: () => void;
 }
 
 export default function CalendarsView(props: ICalendarsViewProps) {
-    const {
-        calendars,
-        toggleSelectedCalendar,
-        selectedCalendars,
-        refreshEvents,
-    } = props;
-    const [editingEvent, setEditingEvent] = useState<IEvent | null>(null);
-
+    const { calendars, toggleSelectedCalendar, selectedCalendars, onNewEvent } =
+        props;
     const classes = useStyles();
-
-    function handleNovoEvento() {
-        setEditingEvent({
-            date: getToday(),
-            desc: '',
-            calendarId: calendars[0].id,
-        });
-    }
-
-    function handleEventSave() {
-        setEditingEvent(null);
-        refreshEvents();
-    }
 
     return (
         <Box className={classes.agenda}>
             <h1>Agenda</h1>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNovoEvento}
-            >
+            <Button variant="contained" color="primary" onClick={onNewEvent}>
                 Novo evento
             </Button>
             <h2 style={{ marginTop: '2em' }}>Agendas</h2>
@@ -78,13 +52,6 @@ export default function CalendarsView(props: ICalendarsViewProps) {
                     />
                 ))}
             </FormGroup>
-            <EventFormDialog
-                open={!!editingEvent}
-                onCancel={() => setEditingEvent(null)}
-                onSave={handleEventSave}
-                calendars={calendars}
-                event={editingEvent}
-            />
         </Box>
     );
 }

@@ -6,13 +6,15 @@ import { useParams } from 'react-router';
 import Calendar from './Calendar';
 import CalendarHeader from './CalendarHeader';
 import CalendarsView from './CalendarsView';
+import EventFormDialog from './EventFormDialog';
 import {
+    deleteEventEndpoint,
     getCalendarsEndpoint,
     getEventsEndpoint,
     ICalendar,
     IEvent,
 } from './services/backend';
-import { generateCalendar } from './services/date';
+import { generateCalendar, getToday } from './services/date';
 
 const useStyles = makeStyles(() => ({
     tableContainer: {
@@ -28,6 +30,7 @@ export default function CalendarScreen() {
     const [events, setEvents] = useState<IEvent[]>([]);
     const [calendars, setCalendars] = useState<ICalendar[]>([]);
     const [selectedCalendars, setSelectedCalendars] = useState<boolean[]>([]);
+    const [editingEvent, setEditingEvent] = useState<IEvent | null>(null);
 
     const selectedCalendarEvents: IEvent[] = [];
     for (const event of events) {
@@ -65,9 +68,29 @@ export default function CalendarScreen() {
         });
     }
 
+    function handleNovoEvento(date: string) {
+        setEditingEvent({
+            date,
+            desc: '',
+            calendarId: calendars[0].id,
+        });
+    }
+
     async function refreshEvents() {
         const events = await getEventsEndpoint(firstDate, lastDate);
         setEvents(events);
+    }
+
+    function handleEventSave() {
+        setEditingEvent(null);
+        refreshEvents();
+    }
+
+    async function handleEventDelete() {
+        if (editingEvent?.id) {
+            await deleteEventEndpoint(editingEvent?.id);
+            handleEventSave();
+        }
     }
 
     const classes = useStyles();
@@ -78,15 +101,27 @@ export default function CalendarScreen() {
                 calendars={calendars}
                 toggleSelectedCalendar={toggleSelectedCalendar}
                 selectedCalendars={selectedCalendars}
-                refreshEvents={refreshEvents}
+                onNewEvent={() => handleNovoEvento(getToday())}
             />
             <TableContainer
                 component={'div'}
                 className={classes.tableContainer}
             >
                 <CalendarHeader month={month ?? ''} />
-                <Calendar weeks={weeks} />
+                <Calendar
+                    weeks={weeks}
+                    onDayClicked={handleNovoEvento}
+                    onEventClicked={setEditingEvent}
+                />
             </TableContainer>
+            <EventFormDialog
+                open={!!editingEvent}
+                onCancel={() => setEditingEvent(null)}
+                onSave={handleEventSave}
+                onDelete={handleEventDelete}
+                calendars={calendars}
+                event={editingEvent}
+            />
         </Box>
     );
 }
