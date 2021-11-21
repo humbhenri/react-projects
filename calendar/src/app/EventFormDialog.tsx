@@ -11,7 +11,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { createEventEndpoint, ICalendar, IEvent } from './services/backend';
 
 interface IEventFormDialogProps {
@@ -22,14 +22,23 @@ interface IEventFormDialogProps {
     event: IEvent | null;
 }
 
+interface IValidationErrors {
+    [field: string]: string;
+}
+
 export default function EventFormDialog(props: IEventFormDialogProps) {
     const { open, onCancel, onSave, calendars } = props;
     const [event, setEvent] = useState(props.event);
+    const [errors, setErrors] = useState<IValidationErrors>({});
+
+    const inputDate = useRef<HTMLInputElement | null>(null);
+    const inputDesc = useRef<HTMLInputElement | null>(null);
 
     // sem isso o event fica null pra sempre, porque o useState só é executado
     // uma vez
     useEffect(() => {
         setEvent(props.event);
+        setErrors({});
     }, [props.event]);
 
     function handleChange(evt: ChangeEvent<HTMLInputElement>) {
@@ -43,19 +52,39 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
         setEvent(newEvent);
     }
 
+    function validate(): boolean {
+        if (event) {
+            const currentErrors: IValidationErrors = {};
+            const { date, desc } = event;
+            if (!date) {
+                currentErrors['date'] = 'Data deve ser preenchida';
+                inputDate.current?.focus();
+            }
+            if (!desc) {
+                currentErrors['desc'] = 'Descrição deve ser preenchida';
+                inputDesc.current?.focus();
+            }
+            setErrors(currentErrors);
+            return Object.keys(currentErrors).length === 0;
+        }
+        return false;
+    }
+
     async function save(evt: FormEvent) {
         evt.preventDefault();
-        await createEventEndpoint(event!);
-        onSave();
+        if (validate()) {
+            await createEventEndpoint(event!);
+            onSave();
+        }
     }
 
     return (
         <div>
-            <Dialog open={open} onClose={onCancel}>
-                <form onSubmit={save}>
-                    <DialogTitle>New event</DialogTitle>
-                    <DialogContent>
-                        {event && (
+            {event && (
+                <Dialog open={open} onClose={onCancel}>
+                    <form onSubmit={save}>
+                        <DialogTitle>New event</DialogTitle>
+                        <DialogContent>
                             <>
                                 <TextField
                                     type="date"
@@ -65,15 +94,20 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
                                     value={event.date}
                                     onChange={handleChange}
                                     id="date"
+                                    error={!!errors.date}
+                                    helperText={errors.date}
+                                    inputRef={inputDate}
                                 />
                                 <TextField
-                                    autoFocus
                                     margin="normal"
                                     label="Descrição"
                                     fullWidth
                                     value={event.desc}
                                     onChange={handleChange}
                                     id="desc"
+                                    error={!!errors.desc}
+                                    helperText={errors.desc}
+                                    inputRef={inputDesc}
                                 />
                                 <TextField
                                     type="time"
@@ -85,10 +119,8 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
                                     id="time"
                                 />
                             </>
-                        )}
-                        <FormControl fullWidth>
-                            <InputLabel>Agenda</InputLabel>
-                            {event && (
+                            <FormControl fullWidth>
+                                <InputLabel>Agenda</InputLabel>
                                 <Select
                                     labelId="select-calendar"
                                     value={event.calendarId}
@@ -103,23 +135,23 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
                                         </MenuItem>
                                     ))}
                                 </Select>
-                            )}
-                        </FormControl>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button type="button" onClick={onCancel}>
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            color="primary"
-                            variant="contained"
-                        >
-                            Save
-                        </Button>
-                    </DialogActions>
-                </form>
-            </Dialog>
+                            </FormControl>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button type="button" onClick={onCancel}>
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                color="primary"
+                                variant="contained"
+                            >
+                                Save
+                            </Button>
+                        </DialogActions>
+                    </form>
+                </Dialog>
+            )}
         </div>
     );
 }

@@ -35,7 +35,6 @@ export default function CalendarsView(props: ICalendarsViewProps) {
     const classes = useStyles();
 
     function handleNovoEvento() {
-        console.log('new event');
         setEditingEvent({
             date: getToday(),
             desc: '',
