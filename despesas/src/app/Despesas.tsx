@@ -6,6 +6,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { makeStyles } from "@mui/styles";
 import { IDespesa } from "./services/backend";
+import { formatMoney } from "./services/money";
 
 const useStyles = makeStyles(() => ({
   table: {
@@ -36,7 +37,7 @@ export default function Despesas(props: { despesas: IDespesa[] }) {
               <TableCell align="left">{descricao}</TableCell>
               <TableCell align="left">{categoria}</TableCell>
               <TableCell align="left">{dia}</TableCell>
-              <TableCell align="left">{valor}</TableCell>
+              <TableCell align="left">{formatMoney(valor).substr(3)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
