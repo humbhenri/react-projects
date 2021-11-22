@@ -1,12 +1,12 @@
 import { IconButton } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import Icon from "@material-ui/core/Icon";
-import Avatar from "@mui/material/Avatar";
 import { Link } from "react-router-dom";
 import { formatMonth, nextMonth, previousMonth } from "./services/date";
 
 interface ICalendarHeaderProps {
   month: string;
+  children: React.ReactNode;
 }
 
 export default function CalendarHeader(props: ICalendarHeaderProps) {
@@ -26,11 +26,7 @@ export default function CalendarHeader(props: ICalendarHeaderProps) {
         <h3>{formatMonth(month ?? "")}</h3>
       </Box>
       <Box display="flex" alignItems="center" justifyItems="center">
-        <IconButton>
-          <Avatar alt="avatar">
-            <Icon>person</Icon>
-          </Avatar>
-        </IconButton>
+        {props.children}
       </Box>
     </Box>
   );
