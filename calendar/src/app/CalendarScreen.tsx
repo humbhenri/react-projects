@@ -13,7 +13,6 @@ import {
   getEventsEndpoint,
   ICalendar,
   IEvent,
-  IUser,
 } from "./services/backend";
 import { generateCalendar, getToday } from "./services/date";
 import UserMenu from "./UserMenu";
@@ -27,7 +26,6 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface CalendarScreenProps {
-  user: IUser;
   onLogout: () => void;
 }
 
@@ -112,7 +110,7 @@ export default function CalendarScreen(props: CalendarScreenProps) {
       />
       <TableContainer component={"div"} className={classes.tableContainer}>
         <CalendarHeader month={month ?? ""}>
-          <UserMenu user={props.user} onLogout={props.onLogout} />
+          <UserMenu onLogout={props.onLogout} />
         </CalendarHeader>
         <Calendar
           weeks={weeks}

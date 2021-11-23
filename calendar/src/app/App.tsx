@@ -6,6 +6,7 @@ import {
   Routes,
 } from "react-router-dom";
 import "./App.css";
+import { userContext } from "./authContext";
 import CalendarScreen from "./CalendarScreen";
 import LoginScreen from "./LoginScreen";
 import { getUserEndpoint, IUser, signOutEndpoint } from "./services/backend";
@@ -26,15 +27,20 @@ function App() {
 
   if (user) {
     return (
-      <Router>
-        <Routes>
-          <Route
-            path="/calendar/:month"
-            element={<CalendarScreen user={user} onLogout={onLogout} />}
-          ></Route>
-          <Route path="*" element={<Navigate to={`/calendar/${mesAtual}`} />} />
-        </Routes>
-      </Router>
+      <userContext.Provider value={user}>
+        <Router>
+          <Routes>
+            <Route
+              path="/calendar/:month"
+              element={<CalendarScreen onLogout={onLogout} />}
+            ></Route>
+            <Route
+              path="*"
+              element={<Navigate to={`/calendar/${mesAtual}`} />}
+            />
+          </Routes>
+        </Router>
+      </userContext.Provider>
     );
   } else {
     return <LoginScreen onSignIn={setUser} />;

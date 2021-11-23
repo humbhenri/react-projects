@@ -1,12 +1,12 @@
 import { Avatar, Icon, IconButton, Menu, MenuItem } from "@material-ui/core";
 import { Box } from "@material-ui/system";
 import { makeStyles } from "@mui/styles";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { userContext } from "./authContext";
 import { IUser } from "./services/backend";
 
 interface UserMenuProps {
   onLogout: () => void;
-  user: IUser;
 }
 
 const useStyles = makeStyles({
@@ -23,6 +23,8 @@ export default function UserMenu(props: UserMenuProps) {
   const classes = useStyles();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const user: IUser = useContext(userContext);
 
   function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     setAnchorEl(event.currentTarget);
@@ -52,9 +54,9 @@ export default function UserMenu(props: UserMenuProps) {
             <Avatar>
               <Icon>person</Icon>
             </Avatar>
-            <div>{props.user.name}</div>
+            <div>{user.name}</div>
             <div>
-              <small>{props.user.email}</small>
+              <small>{user.email}</small>
             </div>
           </Box>
           <MenuItem onClick={props.onLogout}>Logout</MenuItem>
