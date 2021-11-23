@@ -6,7 +6,7 @@ import {
   Routes,
 } from "react-router-dom";
 import "./App.css";
-import { userContext } from "./authContext";
+import { authContext } from "./authContext";
 import CalendarScreen from "./CalendarScreen";
 import LoginScreen from "./LoginScreen";
 import { getUserEndpoint, IUser, signOutEndpoint } from "./services/backend";
@@ -20,27 +20,24 @@ function App() {
     getUserEndpoint().then(setUser, () => setUser(null));
   }, []);
 
-  async function onLogout() {
+  async function onSignout() {
     setUser(null);
     await signOutEndpoint();
   }
 
   if (user) {
     return (
-      <userContext.Provider value={user}>
+      <authContext.Provider value={{ user, onSignout }}>
         <Router>
           <Routes>
-            <Route
-              path="/calendar/:month"
-              element={<CalendarScreen onLogout={onLogout} />}
-            ></Route>
+            <Route path="/calendar/:month" element={<CalendarScreen />}></Route>
             <Route
               path="*"
               element={<Navigate to={`/calendar/${mesAtual}`} />}
             />
           </Routes>
         </Router>
-      </userContext.Provider>
+      </authContext.Provider>
     );
   } else {
     return <LoginScreen onSignIn={setUser} />;

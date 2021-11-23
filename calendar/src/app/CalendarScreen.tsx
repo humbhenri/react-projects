@@ -25,11 +25,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-interface CalendarScreenProps {
-  onLogout: () => void;
-}
-
-export default function CalendarScreen(props: CalendarScreenProps) {
+export default function CalendarScreen() {
   const { month } = useParams<"month">();
 
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -110,7 +106,7 @@ export default function CalendarScreen(props: CalendarScreenProps) {
       />
       <TableContainer component={"div"} className={classes.tableContainer}>
         <CalendarHeader month={month ?? ""}>
-          <UserMenu onLogout={props.onLogout} />
+          <UserMenu />
         </CalendarHeader>
         <Calendar
           weeks={weeks}
