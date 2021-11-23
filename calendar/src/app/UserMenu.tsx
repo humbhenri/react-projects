@@ -14,7 +14,8 @@ const useStyles = makeStyles({
   },
 });
 
-export default function UserMenu() {
+const UserMenu = React.memo(function UserMenu() {
+  console.log("UserMenu");
   const classes = useStyles();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -59,4 +60,6 @@ export default function UserMenu() {
       </IconButton>
     </div>
   );
-}
+});
+
+export default UserMenu;
