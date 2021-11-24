@@ -1,8 +1,8 @@
 import { Avatar, Icon, IconButton, Menu, MenuItem } from "@material-ui/core";
 import { Box } from "@material-ui/system";
 import { makeStyles } from "@mui/styles";
-import React, { useContext, useState } from "react";
-import { authContext } from "./authContext";
+import React, { useState } from "react";
+import { useAuthContext } from "./authContext";
 
 const useStyles = makeStyles({
   user: {
@@ -20,7 +20,7 @@ const UserMenu = React.memo(function UserMenu() {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const { user, onSignout } = useContext(authContext);
+  const { user, onSignout } = useAuthContext();
 
   function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     setAnchorEl(event.currentTarget);

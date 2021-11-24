@@ -24,9 +24,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function CalendarScreen() {
-  const { month } = useParams<"month">();
-
+function useCalendarScreenState(month: string) {
   const [state, dispatch] = useReducer(reducer, {
     calendars: [],
     selectedCalendars: [],
@@ -85,6 +83,30 @@ export default function CalendarScreen() {
     }
   }
 
+  return {
+    weeks,
+    editingEvent,
+    handleEventDelete,
+    closeDialog,
+    calendars,
+    dispatch,
+    selectedCalendars,
+    handleEventSave,
+  };
+}
+
+export default function CalendarScreen() {
+  const { month } = useParams<"month">();
+  const {
+    weeks,
+    editingEvent,
+    handleEventDelete,
+    closeDialog,
+    calendars,
+    dispatch,
+    selectedCalendars,
+    handleEventSave,
+  } = useCalendarScreenState(month!);
   const classes = useStyles();
 
   return (
