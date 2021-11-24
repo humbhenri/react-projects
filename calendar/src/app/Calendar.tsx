@@ -9,6 +9,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { makeStyles } from "@mui/styles";
 import React from "react";
+import { ICalendarScreenAction } from "./calendarScreenReducer";
 import { IEvent } from "./services/backend";
 import { DAYS_OF_WEEK, ICalendarCell } from "./services/date";
 
@@ -49,23 +50,22 @@ const useStyles = makeStyles(() => ({
 
 interface ICalendarProps {
   weeks: ICalendarCell[][];
-  onDayClicked: (date: string) => void;
-  onEventClicked: (event: IEvent) => void;
+  dispatch: React.Dispatch<ICalendarScreenAction>;
 }
 
 const Calendar = React.memo(function Calendar(props: ICalendarProps) {
-  const { weeks, onDayClicked, onEventClicked } = props;
+  const { weeks, dispatch } = props;
 
   const classes = useStyles();
 
   function handleEventClick(evt: React.MouseEvent, event: IEvent) {
-    onEventClicked(event);
+    dispatch({ type: "edit", payload: event });
   }
 
   function handleCellClick(evt: React.MouseEvent, date: string) {
     if (evt.target === evt.currentTarget) {
       // clicado na área vazia
-      onDayClicked(date);
+      dispatch({ type: "new", payload: date });
     }
   }
 

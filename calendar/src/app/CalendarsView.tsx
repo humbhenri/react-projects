@@ -5,7 +5,9 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import { makeStyles } from "@mui/styles";
 import React from "react";
+import { ICalendarScreenAction } from "./calendarScreenReducer";
 import { ICalendar } from "./services/backend";
+import { getToday } from "./services/date";
 
 const useStyles = makeStyles((theme?: any) => ({
   agenda: {
@@ -16,21 +18,23 @@ const useStyles = makeStyles((theme?: any) => ({
 
 interface ICalendarsViewProps {
   calendars: ICalendar[];
-  toggleSelectedCalendar: (i: number) => void;
   selectedCalendars: boolean[];
-  onNewEvent: () => void;
+  dispatch: React.Dispatch<ICalendarScreenAction>;
 }
 
 const CalendarsView = React.memo((props: ICalendarsViewProps) => {
   console.log("CalendarsView");
-  const { calendars, toggleSelectedCalendar, selectedCalendars, onNewEvent } =
-    props;
+  const { calendars, dispatch, selectedCalendars } = props;
   const classes = useStyles();
 
   return (
     <Box className={classes.agenda}>
       <h1>Agenda</h1>
-      <Button variant="contained" color="primary" onClick={onNewEvent}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => dispatch({ type: "new", payload: getToday() })}
+      >
         Novo evento
       </Button>
       <h2 style={{ marginTop: "2em" }}>Agendas</h2>
@@ -47,7 +51,9 @@ const CalendarsView = React.memo((props: ICalendarsViewProps) => {
                   },
                 }}
                 checked={selectedCalendars[i]}
-                onChange={() => toggleSelectedCalendar(i)}
+                onChange={() =>
+                  dispatch({ type: "toggleSelectedCalendar", payload: i })
+                }
               />
             }
             label={calendar.name}
