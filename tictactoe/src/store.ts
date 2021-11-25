@@ -1,5 +1,9 @@
-import { Action, configureStore, PayloadAction } from "@reduxjs/toolkit";
-import { useSelector, useDispatch, TypedUseSelectorHook } from "react-redux";
+import {
+    configureStore,
+    createSlice,
+    PayloadAction
+} from "@reduxjs/toolkit";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 type Cell = "X" | "O" | "";
 type Winner = "X" | "O" | "?" | "=";
@@ -48,35 +52,32 @@ const initialState: TicTacToeState = {
   winner: "?",
 };
 
-type ActionPlay = PayloadAction<{ i: number; j: number }, "play">;
-type ActionReset = Action<"reset">;
+type ActionPlay = PayloadAction<{ i: number; j: number }>;
 
-function ticTacToeReducer(
-  state = initialState,
-  action: ActionPlay | ActionReset
-): TicTacToeState {
-  switch (action.type) {
-    case "play":
-      const board = state.board.map((row) => row.map((cell) => cell));
+const slice = createSlice({
+  name: "ticTacToe",
+  initialState,
+  reducers: {
+    play: (state, action: ActionPlay) => {
       const { i, j } = action.payload;
-      if (board[i][j] === "" && getWinner(board) === "?") {
-        board[i][j] = state.nextPlayer;
-        return {
-          nextPlayer: state.nextPlayer === "X" ? "O" : "X",
-          board,
-          winner: getWinner(board),
-        };
+      if (state.board[i][j] === "" && state.winner === "?") {
+        state.board[i][j] = state.nextPlayer;
+        state.nextPlayer = state.nextPlayer === "X" ? "O" : "X";
+        state.winner = getWinner(state.board);
       } else {
         return state;
       }
-    case "reset":
-        return initialState;
-  }
-  return state;
-}
+    },
+    reset: () => {
+      return initialState;
+    },
+  },
+});
+
+export const { play, reset } = slice.actions;
 
 export const store = configureStore({
-  reducer: { ticTacToe: ticTacToeReducer },
+  reducer: { ticTacToe: slice.reducer },
 });
 
 type RootState = ReturnType<typeof store.getState>;
