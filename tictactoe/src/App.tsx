@@ -1,10 +1,14 @@
-import './App.css';
-import TicTacToe from './TicTacToe';
+import { Provider } from "react-redux";
+import "./App.css";
+import { store } from "./store";
+import TicTacToe from "./TicTacToe";
 
 function App() {
   return (
     <div className="App">
-      <TicTacToe />
+      <Provider store={store}>
+        <TicTacToe />
+      </Provider>
     </div>
   );
 }
