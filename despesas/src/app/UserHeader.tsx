@@ -1,8 +1,9 @@
 import { Button } from "@mui/material";
 import { Box } from "@mui/system";
+import React from "react";
 import { useAuthContext } from "./authContext";
 
-export default function UserHeader() {
+const UserHeader = React.memo(function UserHeader() {
   const { user, onSignout } = useAuthContext();
   return (
     <Box display="flex" alignItems="center">
@@ -18,4 +19,5 @@ export default function UserHeader() {
       </Button>
     </Box>
   );
-}
+});
+export default UserHeader;

@@ -1,11 +1,14 @@
 import { makeStyles } from "@mui/styles";
 import { Box } from "@mui/system";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { useNavigate, useParams } from "react-router";
 import AnoMes from "./AnoMes";
+import BasicTabs from "./BasicTabs";
 import Despesas from "./Despesas";
+import { reducer } from "./despesasScreenReducer";
 import Header from "./Header";
-import { getDespesas, IDespesa } from "./services/backend";
+import Resumo from "./Resumo";
+import { getDespesas } from "./services/backend";
 import { getTodayMonth } from "./services/date";
 import { formatMoney } from "./services/money";
 import UserHeader from "./UserHeader";
@@ -29,33 +32,37 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function DespesasScreen() {
-  const { month } = useParams<"month">();
-  let navigate = useNavigate();
-  const [anoMes, setAnoMes] = useState<string>(month ?? getTodayMonth());
-  const [despesas, setDespesas] = useState<IDespesa[]>([]);
-  const [despesaTotal, setDespesaTotal] = useState<number>(0);
-  const classes = useStyles();
+function useDespesasScreenState(month: string) {
+  const [state, dispatch] = useReducer(reducer, {
+    anoMes: month ?? getTodayMonth(),
+    despesas: [],
+    despesaTotal: 0,
+    despesasCategoria: [],
+  });
+  const { anoMes, despesas, despesaTotal, despesasCategoria } = state;
 
   useEffect(() => {
-    setAnoMes(month!);
+    dispatch({ type: "trocaMes", payload: month! });
   }, [month]);
 
   useEffect(() => {
     getDespesas(anoMes).then((_despesas) => {
-      setDespesas(_despesas);
-      if (_despesas.length) {
-        setDespesaTotal(
-          _despesas.map((d) => d.valor).reduce((acc, valor) => acc + valor)
-        );
-      } else {
-        setDespesaTotal(0);
-      }
+      dispatch({ type: "load", payload: { anoMes, despesas: _despesas } });
     });
   }, [anoMes]);
 
+  return { dispatch, anoMes, despesaTotal, despesas, despesasCategoria };
+}
+
+export default function DespesasScreen() {
+  const { month } = useParams<"month">();
+  let navigate = useNavigate();
+  const classes = useStyles();
+  const { dispatch, anoMes, despesaTotal, despesas, despesasCategoria } =
+    useDespesasScreenState(month!);
+
   function handleMesSelected(mes: string) {
-    setAnoMes(mes);
+    dispatch({ type: "trocaMes", payload: mes });
     navigate(`/despesas/${mes}`);
   }
 
@@ -78,7 +85,10 @@ export default function DespesasScreen() {
           </span>
         </Box>
       </Header>
-      <Despesas despesas={despesas}></Despesas>
+      <BasicTabs>
+        <Resumo despesas={despesasCategoria} />
+        <Despesas despesas={despesas}></Despesas>
+      </BasicTabs>
     </Box>
   );
 }
