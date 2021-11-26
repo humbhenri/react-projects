@@ -4,6 +4,7 @@ import { Box } from "@mui/system";
 const useStyles = makeStyles(() => ({
   header: {
     display: "flex",
+    flexDirection: "column",
     margin: "1em 4em",
     padding: "6px 16px",
     alignItems: "center",

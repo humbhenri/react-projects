@@ -8,6 +8,7 @@ import Header from "./Header";
 import { getDespesas, IDespesa } from "./services/backend";
 import { getTodayMonth } from "./services/date";
 import { formatMoney } from "./services/money";
+import UserHeader from "./UserHeader";
 
 const useStyles = makeStyles(() => ({
   table: {
@@ -61,11 +62,21 @@ export default function DespesasScreen() {
   return (
     <Box>
       <Header>
-        <AnoMes onMesSelected={handleMesSelected} anoMes={anoMes}></AnoMes>
-        <Box flex="1"></Box>
-        <span className={classes.despesaTotal}>
-          Despesa total: <strong>{formatMoney(despesaTotal)}</strong>
-        </span>
+        <Box width="100%">
+          <UserHeader />
+        </Box>
+        <Box
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          width="100%"
+        >
+          <AnoMes onMesSelected={handleMesSelected} anoMes={anoMes}></AnoMes>
+          <Box flex="1"></Box>
+          <span className={classes.despesaTotal}>
+            Despesa total: <strong>{formatMoney(despesaTotal)}</strong>
+          </span>
+        </Box>
       </Header>
       <Despesas despesas={despesas}></Despesas>
     </Box>
