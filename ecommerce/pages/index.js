@@ -1,30 +1,28 @@
 import Head from "next/head";
+import { getAllProducts } from "../lib";
+import Product from "../components/product";
 
-// api
-// fetch('https://fakestoreapi.com/products/1')
-//             .then(res=>res.json())
-//             .then(json=>console.log(json))
+export async function getStaticProps() {
+  const products = await getAllProducts();
+  return {
+    props: { products },
+  };
+}
 
-// produto
-// {
-//   "id": 1,
-//   "title": "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-//   "price": 109.95,
-//   "description": "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
-//   "category": "men's clothing",
-//   "image": "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-//   "rating": {
-//     "rate": 3.9,
-//     "count": 120
-//   }
-// }
-
-export default function Home() {
+export default function Home({ products }) {
   return (
     <div className="container">
       <Head>
         <title>Ecommerce</title>
         <link rel="icon" href="/favicon.ico" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        />
       </Head>
 
       <main>
@@ -32,44 +30,10 @@ export default function Home() {
 
         <p className="description">Onde você compra de tudo</p>
 
-        <ul>
-          <li
-            style={{
-              listStyle: "none",
-              margin: "0 auto",
-              width: "50%",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ textAlign: "center" }}>
-                <img
-                  src="https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
-                  style={{
-                    width: "30%",
-                    marginRight: "3rem",
-                  }}
-                />
-              </div>
-              <div>
-                <section>
-                  Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops
-                </section>
-                <section>$ 109.95</section>
-                <section>
-                  Your perfect pack for everyday use and walks in the forest.
-                  Stash your laptop (up to 15 inches) in the padded sleeve, your
-                  everyday"
-                </section>
-                <section>men's clothing</section>
-                <section> 3.9 (120)</section>
-              </div>
-            </div>
-          </li>
+        <ul className="grid">
+          {products?.map((product) => (
+            <Product product={product} />
+          ))}
         </ul>
       </main>
 
