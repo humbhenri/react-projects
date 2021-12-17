@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import slugify from "slugify";
 import { getDataForYear, headers } from "../services/backend";
 import ButtonAppBar from "./ButtonAppBar";
 import DataTable from "./DataTable";
@@ -10,6 +11,7 @@ import YearSelect from "./YearSelect";
 export default function MainScreen() {
   const { year } = useParams<"year">();
   const [yearValue, setYearValue] = useState(+year!);
+  const [rows, setRows] = useState<any>([]);
   const navigate = useNavigate();
 
   function handleYearSelected(_year: number) {
@@ -17,8 +19,21 @@ export default function MainScreen() {
     navigate(`/year/${_year}`);
   }
 
-  const rows = getDataForYear(yearValue);
-  rows[0].values[0] = <Team src="/img/cruzeiro.png" label="Cruzeiro" />
+  function setTeamShield(team: { id: string; values: any[] }) {
+    const src = slugify(team.id, '_').toLowerCase();
+    team.values.unshift(
+      <Team label={team.id} src={`/img/${src}.png`} />
+    );
+  }
+
+  useEffect(() => {
+    getDataForYear(yearValue).then((data) => {
+      data.forEach((team: { id: string; values: any[] }) =>
+        setTeamShield(team)
+      );
+      setRows(data);
+    });
+  }, [yearValue]);
 
   return (
     <>

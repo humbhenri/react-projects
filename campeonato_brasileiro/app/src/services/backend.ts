@@ -1,7 +1,9 @@
-export const headers = ["", "Total", "V", "E", "GP", "GC", "S"];
+export const headers = ["", "Total", "V", "E", "D", "GP", "GC", "S"];
 
-export function getDataForYear(year: number): any[] {
-  return [{id: 1, values: ['cruzeiro', '71', '19', '20', '14', '11', '44']}];
+export async function getDataForYear(year: number): Promise<any> {
+  const res = await fetch(`http://localhost:3001/${year}`);
+  const data: any = await res.json();
+  return ranking(data);
 }
 
 function sortData(data: any[] | undefined) {
