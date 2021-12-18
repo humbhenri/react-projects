@@ -1,7 +1,7 @@
 export const headers = ["", "Total", "V", "E", "D", "GP", "GC", "S"];
 
 export async function getDataForYear(year: number): Promise<any> {
-  const res = await fetch(`http://localhost:3001/${year}`);
+  const res = await fetch(`http://127.0.0.1:3001/${year}`);
   const data: any = await res.json();
   return ranking(data);
 }

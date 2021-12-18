@@ -22,14 +22,16 @@ export default function DataTable(props: IDataTableProps) {
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
+            <TableCell></TableCell>
             {headers.map((header) => (
               <TableCell key={header}>{header}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {rows.map((row, i) => (
             <TableRow key={row.id}>
+              <TableCell>{i + 1}</TableCell>
               {row.values.map((value) => (
                 <TableCell>{value}</TableCell>
               ))}
